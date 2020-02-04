@@ -1,5 +1,7 @@
 import com.lowlevelsubmarine.ytml.YTML;
-import com.lowlevelsubmarine.ytml.library.Search;
+import com.lowlevelsubmarine.ytml.library.Song;
+
+import java.util.List;
 
 public class SearchTest {
 
@@ -7,9 +9,11 @@ public class SearchTest {
 
         YTML ytml = new YTML();
         ytml.fetchKey();
-        Search search = ytml.search("illenium").complete();
-        System.out.println(search.getSongs().get().get(0).getName());
-
+        List<Song> songResults = ytml.search("illenium").complete().getSongs().parse().complete();
+        System.out.println();
+        for (Song song : songResults) {
+            System.out.println(song.getName() + " by " + song.getArtists());
+        }
     }
 
 }

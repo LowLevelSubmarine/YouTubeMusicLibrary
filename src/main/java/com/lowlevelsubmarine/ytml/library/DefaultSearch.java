@@ -2,6 +2,7 @@ package com.lowlevelsubmarine.ytml.library;
 
 import com.google.gson.*;
 import com.lowlevelsubmarine.ytml.YTML;
+import com.lowlevelsubmarine.ytml.actions.RestAction;
 import com.lowlevelsubmarine.ytml.tools.JSONTools;
 
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class DefaultSearch implements Search {
 
@@ -85,8 +85,8 @@ public class DefaultSearch implements Search {
         }
 
         @Override
-        protected Song createResultItem(JsonObject obj) {
-            return new SongFields(obj);
+        protected Song createResultItem(JsonObject obj, boolean hasCategoryColumn) {
+            return new SongFields(obj, hasCategoryColumn);
         }
 
     }
@@ -103,8 +103,8 @@ public class DefaultSearch implements Search {
         }
 
         @Override
-        protected Video createResultItem(JsonObject obj) {
-            return new VideoFields(obj);
+        protected Video createResultItem(JsonObject obj, boolean hasCategoryColumn) {
+            return new VideoFields(obj, hasCategoryColumn);
         }
 
     }
@@ -112,7 +112,7 @@ public class DefaultSearch implements Search {
     private abstract class ResultFields<T> implements Result<T> {
 
         protected abstract String getType();
-        protected abstract T createResultItem(JsonObject obj);
+        protected abstract T createResultItem(JsonObject obj, boolean hasCategoryColumn);
 
         private final int pos;
         private final boolean parsed;
@@ -130,9 +130,12 @@ public class DefaultSearch implements Search {
             } else {
                 this.parsed = true;
                 this.pos = pos;
-                this.params = null;
+                this.params = obj
+                        .getAsJsonObject("bottomEndpoint")
+                        .getAsJsonObject("searchEndpoint")
+                        .get("params").getAsString();
                 for (JsonElement jsonElement : obj.getAsJsonArray("contents")) {
-                    this.results.add(createResultItem(jsonElement.getAsJsonObject()));
+                    this.results.add(createResultItem(jsonElement.getAsJsonObject(), true));
                 }
             }
         }
@@ -156,9 +159,26 @@ public class DefaultSearch implements Search {
         }
 
         @Override
-        public CompletableFuture<List<T>> parse() {
-            //JsonObject obj = requestJson();
-            return null;
+        public RestAction<List<T>> parse() {
+            return new RestAction<>(() -> {
+                try {
+                    JsonObject obj = requestJson(this.params);
+                    JsonArray items = obj.getAsJsonObject("contents")
+                            .getAsJsonObject("sectionListRenderer")
+                            .getAsJsonArray("contents")
+                            .get(0).getAsJsonObject()
+                            .getAsJsonObject("musicShelfRenderer")
+                            .getAsJsonArray("contents");
+                    LinkedList<T> results = new LinkedList<>();
+                    for (JsonElement item : items) {
+                        results.add(createResultItem(item.getAsJsonObject(), false));
+                    }
+                    return results;
+                } catch (IOException e) {
+                    return null;
+                }
+
+            });
         }
 
         private JsonObject requestJson(String params) throws IOException {
@@ -186,7 +206,7 @@ public class DefaultSearch implements Search {
         private final String artist;
         private final String artists;
 
-        public SongFields(JsonObject obj) {
+        public SongFields(JsonObject obj, boolean hasCategoryColumn) {
             obj = obj.getAsJsonObject("musicResponsiveListItemRenderer");
             this.id = obj
                     .getAsJsonObject("doubleTapCommand")
@@ -199,7 +219,7 @@ public class DefaultSearch implements Search {
                     .getAsJsonObject("text"));
             String artistColumn = JSONTools.extractRun(obj
                     .getAsJsonArray("flexColumns")
-                    .get(2).getAsJsonObject()
+                    .get(hasCategoryColumn? 2 : 1).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
                     .getAsJsonObject("text"));
             MetaConverter metaConverter = new MetaConverter(titleColumn, artistColumn);
@@ -237,7 +257,7 @@ public class DefaultSearch implements Search {
         private final String channelName;
         private final String channelId;
 
-        public VideoFields(JsonObject obj) {
+        public VideoFields(JsonObject obj, boolean hasCategoryColumn) {
             obj = obj.getAsJsonObject("musicResponsiveListItemRenderer");
             this.id = obj
                     .getAsJsonObject("doubleTapCommand")
@@ -250,7 +270,7 @@ public class DefaultSearch implements Search {
                     .getAsJsonObject("text"));
             this.channelName = JSONTools.extractRun(obj
                     .getAsJsonArray("flexColumns")
-                    .get(2).getAsJsonObject()
+                    .get(hasCategoryColumn? 2 : 1).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
                     .getAsJsonObject("text"));
             this.channelId = null;

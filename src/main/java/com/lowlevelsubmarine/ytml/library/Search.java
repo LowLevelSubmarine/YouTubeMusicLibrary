@@ -1,8 +1,8 @@
 package com.lowlevelsubmarine.ytml.library;
 
-import java.util.Collection;
+import com.lowlevelsubmarine.ytml.actions.RestAction;
+
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public interface Search {
 
@@ -15,7 +15,7 @@ public interface Search {
 
         int pos();
         List<T> get();
-        CompletableFuture<List<T>> parse();
+        RestAction<List<T>> parse();
 
     }
 

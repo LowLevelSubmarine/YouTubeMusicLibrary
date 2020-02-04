@@ -2,7 +2,12 @@ package com.lowlevelsubmarine.ytml.meta_extraction;
 
 public interface MetaExtractor {
 
-    String getTitle();
-    String getAuthor();
+    Meta extract(String videoTitle, String channelName);
+
+    interface Meta {
+        String getTitle();
+        String getArtist();
+        String getArtists();
+    }
 
 }
