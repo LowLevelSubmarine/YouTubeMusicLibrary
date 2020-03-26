@@ -1,4 +1,4 @@
 package com.lowlevelsubmarine.ytml.urls;
 
-public class DefaultUrlParser {
+public class DefaultStreamUrlParser {
 }

@@ -2,12 +2,15 @@ package com.lowlevelsubmarine.ytml.library;
 
 import com.lowlevelsubmarine.ytml.YTML;
 import com.lowlevelsubmarine.ytml.actions.RestAction;
+import com.lowlevelsubmarine.ytml.meta_extraction.DefaultMetaExtractor;
+import com.lowlevelsubmarine.ytml.meta_extraction.MetaExtractor;
 
 import java.io.IOException;
 
 public class DefaultProvider implements Provider {
 
     private final Search search;
+    private final MetaExtractor metaExtractor = new DefaultMetaExtractor();
 
     public DefaultProvider() {
         this(null);
@@ -28,6 +31,11 @@ public class DefaultProvider implements Provider {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    @Override
+    public MetaExtractor getMetaExtractor(YTML ytml) {
+        return this.metaExtractor;
     }
 
 }

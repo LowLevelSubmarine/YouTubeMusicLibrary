@@ -16,7 +16,12 @@ public interface Search {
         int pos();
         List<T> get();
         RestAction<List<T>> parse();
+        //RestAction<List<T>> parse(int page);
 
+    }
+
+    enum ResultType {
+        SONG, VIDEO, ARTIST, ALBUM,
     }
 
 }

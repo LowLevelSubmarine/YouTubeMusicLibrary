@@ -199,7 +199,7 @@ public class DefaultSearch implements Search {
 
     }
 
-    private class SongFields implements Song {
+    private static class SongFields implements Song {
 
         private final String id;
         private final String name;
@@ -250,7 +250,7 @@ public class DefaultSearch implements Search {
 
     }
 
-    private class VideoFields implements Video {
+    private static class VideoFields implements Video {
 
         private final String id;
         private final String title;

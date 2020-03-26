@@ -9,7 +9,7 @@ public class SearchTest {
 
         YTML ytml = new YTML();
         ytml.fetchKey();
-        List<Song> songResults = ytml.search("illenium").complete().getSongs().parse().complete();
+        List<Song> songResults = ytml.search("shy martin").complete().getSongs().parse().complete();
         System.out.println();
         for (Song song : songResults) {
             System.out.println(song.getName() + " by " + song.getArtists());
