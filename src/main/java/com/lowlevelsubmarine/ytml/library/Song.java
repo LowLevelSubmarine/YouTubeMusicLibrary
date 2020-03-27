@@ -6,5 +6,6 @@ public interface Song {
     String getName();
     String getArtist();
     String getArtists();
+    long getDuration();
 
 }

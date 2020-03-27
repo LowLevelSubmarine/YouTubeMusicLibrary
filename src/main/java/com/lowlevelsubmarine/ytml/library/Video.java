@@ -6,5 +6,6 @@ public interface Video {
     String getTitle();
     String getChannelName();
     String getChannelId();
+    long getDuration();
 
 }

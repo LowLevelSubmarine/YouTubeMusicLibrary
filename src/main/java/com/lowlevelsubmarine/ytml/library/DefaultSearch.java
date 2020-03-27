@@ -3,6 +3,7 @@ package com.lowlevelsubmarine.ytml.library;
 import com.google.gson.*;
 import com.lowlevelsubmarine.ytml.YTML;
 import com.lowlevelsubmarine.ytml.actions.RestAction;
+import com.lowlevelsubmarine.ytml.tools.FormatTools;
 import com.lowlevelsubmarine.ytml.tools.JSONTools;
 
 import java.io.IOException;
@@ -205,6 +206,7 @@ public class DefaultSearch implements Search {
         private final String name;
         private final String artist;
         private final String artists;
+        private final long duration;
 
         public SongFields(JsonObject obj, boolean hasCategoryColumn) {
             obj = obj.getAsJsonObject("musicResponsiveListItemRenderer");
@@ -222,6 +224,12 @@ public class DefaultSearch implements Search {
                     .get(hasCategoryColumn? 2 : 1).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
                     .getAsJsonObject("text"));
+            String durationColumn = JSONTools.extractRun(obj
+                    .getAsJsonArray("flexColumns")
+                    .get(hasCategoryColumn? 4 : 3).getAsJsonObject()
+                    .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
+                    .getAsJsonObject("text"));
+            this.duration = FormatTools.durationTextToMillis(durationColumn);
             MetaConverter metaConverter = new MetaConverter(titleColumn, artistColumn);
             this.name = metaConverter.getTitle();
             this.artist = metaConverter.getArtist();
@@ -248,6 +256,11 @@ public class DefaultSearch implements Search {
             return this.artists;
         }
 
+        @Override
+        public long getDuration() {
+            return this.duration;
+        }
+
     }
 
     private static class VideoFields implements Video {
@@ -256,6 +269,7 @@ public class DefaultSearch implements Search {
         private final String title;
         private final String channelName;
         private final String channelId;
+        private final long duration;
 
         public VideoFields(JsonObject obj, boolean hasCategoryColumn) {
             obj = obj.getAsJsonObject("musicResponsiveListItemRenderer");
@@ -273,7 +287,13 @@ public class DefaultSearch implements Search {
                     .get(hasCategoryColumn? 2 : 1).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
                     .getAsJsonObject("text"));
+            String durationColumn = JSONTools.extractRun(obj
+                    .getAsJsonArray("flexColumns")
+                    .get(hasCategoryColumn? 4 : 3).getAsJsonObject()
+                    .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
+                    .getAsJsonObject("text"));
             this.channelId = null;
+            this.duration = FormatTools.durationTextToMillis(durationColumn);
         }
 
         @Override
@@ -294,6 +314,11 @@ public class DefaultSearch implements Search {
         @Override
         public String getChannelId() {
             return this.channelId;
+        }
+
+        @Override
+        public long getDuration() {
+            return 0;
         }
 
     }
