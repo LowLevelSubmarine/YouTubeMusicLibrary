@@ -1,8 +1,7 @@
 package com.lowlevelsubmarine.ytml.library;
 
-public interface Song {
+public interface Song extends Content {
 
-    String getId();
     String getName();
     String getArtist();
     String getArtists();
