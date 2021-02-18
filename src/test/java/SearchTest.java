@@ -1,19 +1,14 @@
 import com.lowlevelsubmarine.ytml.YTML;
-import com.lowlevelsubmarine.ytml.library.Song;
-
-import java.util.List;
+import com.lowlevelsubmarine.ytml.YTMLBuilder;
+import com.lowlevelsubmarine.ytml.library.interfaces.Search;
 
 public class SearchTest {
 
-    public static void main(String[] args) {
-
-        YTML ytml = new YTML();
-        ytml.fetchKey();
-        List<Song> songResults = ytml.search("shy martin").complete().getSongs().parse().complete();
-        System.out.println();
-        for (Song song : songResults) {
-            System.out.println(song.getName() + " by " + song.getArtists());
-        }
+    public static void main(String[] args) throws Exception {
+        YTML ytml = new YTMLBuilder().build().complete();
+        Search search = ytml.search("Sigrid").complete();
+        search.getSongSection().fetchMore();
+        search.getSongSection().getItems().forEach(song -> System.out.println(song.getArtist() + " / " + song.getTitle()));
     }
 
 }

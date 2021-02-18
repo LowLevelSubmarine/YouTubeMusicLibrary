@@ -1,4 +1,4 @@
-package com.lowlevelsubmarine.ytml.library;
+package com.lowlevelsubmarine.ytml.deprecated_library;
 
 public interface Song extends Content {
 

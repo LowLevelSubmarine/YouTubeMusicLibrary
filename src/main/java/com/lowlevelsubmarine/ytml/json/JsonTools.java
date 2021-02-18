@@ -1,9 +1,9 @@
-package com.lowlevelsubmarine.ytml.tools;
+package com.lowlevelsubmarine.ytml.json;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class JSONTools {
+public class JsonTools {
 
     public static String extractRun(JsonObject obj) {
         JsonArray texts = obj.getAsJsonArray("runs");

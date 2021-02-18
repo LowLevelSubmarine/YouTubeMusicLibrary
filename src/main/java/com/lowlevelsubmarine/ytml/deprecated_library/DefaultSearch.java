@@ -1,10 +1,10 @@
-package com.lowlevelsubmarine.ytml.library;
+package com.lowlevelsubmarine.ytml.deprecated_library;
 
 import com.google.gson.*;
 import com.lowlevelsubmarine.ytml.YTML;
 import com.lowlevelsubmarine.ytml.actions.RestAction;
 import com.lowlevelsubmarine.ytml.tools.FormatTools;
-import com.lowlevelsubmarine.ytml.tools.JSONTools;
+import com.lowlevelsubmarine.ytml.json.JsonTools;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -122,7 +122,7 @@ public class DefaultSearch implements Search {
 
         private ResultFields(JsonObject obj, int pos) {
             obj = obj.getAsJsonObject("musicShelfRenderer");
-            String type = JSONTools.extractRun(obj
+            String type = JsonTools.extractRun(obj
                     .getAsJsonObject("title"));
             if (type == null || !type.equals(getType())) {
                 this.parsed = false;
@@ -214,17 +214,17 @@ public class DefaultSearch implements Search {
                     .getAsJsonObject("doubleTapCommand")
                     .getAsJsonObject("watchEndpoint")
                     .get("videoId").getAsString();
-            String titleColumn = JSONTools.extractRun(obj
+            String titleColumn = JsonTools.extractRun(obj
                     .getAsJsonArray("flexColumns")
                     .get(0).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
                     .getAsJsonObject("text"));
-            String artistColumn = JSONTools.extractRun(obj
+            String artistColumn = JsonTools.extractRun(obj
                     .getAsJsonArray("flexColumns")
                     .get(hasCategoryColumn? 2 : 1).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
                     .getAsJsonObject("text"));
-            String durationColumn = JSONTools.extractRun(obj
+            String durationColumn = JsonTools.extractRun(obj
                     .getAsJsonArray("flexColumns")
                     .get(hasCategoryColumn? 4 : 3).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
@@ -277,17 +277,17 @@ public class DefaultSearch implements Search {
                     .getAsJsonObject("doubleTapCommand")
                     .getAsJsonObject("watchEndpoint")
                     .get("videoId").getAsString();
-            this.title = JSONTools.extractRun(obj
+            this.title = JsonTools.extractRun(obj
                     .getAsJsonArray("flexColumns")
                     .get(0).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
                     .getAsJsonObject("text"));
-            this.channelName = JSONTools.extractRun(obj
+            this.channelName = JsonTools.extractRun(obj
                     .getAsJsonArray("flexColumns")
                     .get(hasCategoryColumn? 2 : 1).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")
                     .getAsJsonObject("text"));
-            String durationColumn = JSONTools.extractRun(obj
+            String durationColumn = JsonTools.extractRun(obj
                     .getAsJsonArray("flexColumns")
                     .get(hasCategoryColumn? 4 : 3).getAsJsonObject()
                     .getAsJsonObject("musicResponsiveListItemFlexColumnRenderer")

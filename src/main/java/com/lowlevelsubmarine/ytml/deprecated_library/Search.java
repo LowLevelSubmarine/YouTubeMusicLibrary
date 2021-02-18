@@ -1,4 +1,4 @@
-package com.lowlevelsubmarine.ytml.library;
+package com.lowlevelsubmarine.ytml.deprecated_library;
 
 import com.lowlevelsubmarine.ytml.actions.RestAction;
 

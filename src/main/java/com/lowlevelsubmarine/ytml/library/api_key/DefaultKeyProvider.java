@@ -1,4 +1,4 @@
-package com.lowlevelsubmarine.ytml.library;
+package com.lowlevelsubmarine.ytml.library.api_key;
 
 import com.google.gson.Gson;
 import com.lowlevelsubmarine.ytml.YTML;
@@ -12,19 +12,19 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DefaultKeyProvider implements KeyParser {
+public class DefaultKeyProvider implements KeyProvider {
 
     private static final URL URL = URLCreator.create("https://music.youtube.com");
-    private static final Pattern PATTERN_KEY = Pattern.compile("<script >ytcfg.set\\(([\\W\\w]*)\\);</script>");
+    private static final Pattern PATTERN_KEY = Pattern.compile("\"INNERTUBE_API_KEY\":\"([^\"]+)\"");
 
-    private final YTML ytml;
+    private final HttpManager httpManager;
 
-    public DefaultKeyProvider(YTML ytml) {
-        this.ytml = ytml;
+    public DefaultKeyProvider(HttpManager httpManager) {
+        this.httpManager = httpManager;
     }
 
     @Override
-    public RestAction<String> getKey() {
+    public RestAction<String> fetchKey() {
         return new RestAction<>(new KeyParseAction());
     }
 
@@ -33,26 +33,18 @@ public class DefaultKeyProvider implements KeyParser {
         @Override
         public String run() {
             try {
-                HttpManager httpManager = DefaultKeyProvider.this.ytml.getHttpManager();
+                HttpManager httpManager = DefaultKeyProvider.this.httpManager;
                 HttpURLConnection con = httpManager.getConnection(URL);
                 String result = httpManager.executeGet(con);
                 Matcher matcher = PATTERN_KEY.matcher(result);
                 if (matcher.find()) {
-                    Gson gson = new Gson();
-                    YtCfgFields ytCfgFields = gson.fromJson(matcher.group(1), YtCfgFields.class);
-                    return ytCfgFields.INNERTUBE_API_KEY;
+                    return matcher.group(1);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
         }
-
-    }
-
-    private class YtCfgFields {
-
-        String INNERTUBE_API_KEY;
 
     }
 
