@@ -71,17 +71,19 @@ public class SearchRequest implements Request {
     @Override
     public void parse(JsonElement root) {
         for (JsonElement element : new JsonSurfer(root).get("contents", "sectionListRenderer" , "contents").getAsJsonArray()) {
-            JsonSurfer surfer = new JsonSurfer(element.getAsJsonObject().get("musicShelfRenderer"));
-            String title;
-            if (surfer.get("title") != null) {
-                title = JsonTools.extractRun(surfer.get("title").getAsJsonObject());
-            } else {
-                title = getHeaderTitle(root);
-            }
-            SearchType searchType = SearchType.getByKey(title);
-            for(ResultFields resultFields : RESULT_Fields_ROUTERS) {
-                if (resultFields.getSearchType() == searchType) {
-                    resultFields.parse(surfer.get());
+            JsonSurfer surfer = new JsonSurfer(element);
+            if (surfer.dive("musicShelfRenderer")) {
+                String title;
+                if (surfer.get("title") != null) {
+                    title = JsonTools.extractRun(surfer.get("title").getAsJsonObject());
+                } else {
+                    title = getHeaderTitle(root);
+                }
+                SearchType searchType = SearchType.getByKey(title);
+                for(ResultFields resultFields : RESULT_Fields_ROUTERS) {
+                    if (resultFields.getSearchType() == searchType) {
+                        resultFields.parse(surfer.get());
+                    }
                 }
             }
         }
@@ -144,7 +146,6 @@ public class SearchRequest implements Request {
 
         @Override
         protected SongFields convertItem(JsonObject jsonObject, boolean isDetailedSearch) {
-            String string = jsonObject.toString();
             JsonSurfer surfer = new JsonSurfer(jsonObject);
             int textOffset = isDetailedSearch ? 0 : 2;
             return new SongFields() {
@@ -162,9 +163,8 @@ public class SearchRequest implements Request {
                             "flexColumns", 1, "musicResponsiveListItemFlexColumnRenderer", "text", "runs", textOffset, "text").getAsString();
                 }
                 @Override public long getDuration() {
-                    return FormatTools.durationTextToMillis(Objects.requireNonNull(surfer.get(
-                            "flexColumns", 1, "musicResponsiveListItemFlexColumnRenderer", "text", "runs", textOffset + 4, "text").getAsString()
-                    ));
+                    JsonSurfer runs = surfer.getSurfer("flexColumns", 1, "musicResponsiveListItemFlexColumnRenderer", "text", "runs");
+                    return FormatTools.durationTextToMillis(Objects.requireNonNull(runs.get(runs.size()-1, "text").getAsString()));
                 }
                 @Override public Thumbnail getThumbnail() {
                     return null;
@@ -205,10 +205,8 @@ public class SearchRequest implements Request {
                             "flexColumns", 1, "musicResponsiveListItemFlexColumnRenderer", "text", "runs", textOffset, "text").getAsString();
                 }
                 @Override public long getDuration() {
-                    String json = surfer.toString();
-                    return FormatTools.durationTextToMillis(Objects.requireNonNull(surfer.get(
-                            "flexColumns", 1, "musicResponsiveListItemFlexColumnRenderer", "text", "runs", textOffset + 4, "text").getAsString()
-                    ));
+                    JsonSurfer runs = surfer.getSurfer("flexColumns", 1, "musicResponsiveListItemFlexColumnRenderer", "text", "runs");
+                    return FormatTools.durationTextToMillis(Objects.requireNonNull(runs.get(runs.size()-1, "text").getAsString()));
                 }
                 @Override public Thumbnail getThumbnail() {
                     return null;

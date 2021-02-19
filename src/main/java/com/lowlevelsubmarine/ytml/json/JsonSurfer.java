@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 
 public class JsonSurfer {
 
-    private final JsonElement element;
+    private JsonElement element;
 
     public JsonSurfer(JsonElement element) {
         this.element = element;
@@ -26,6 +26,23 @@ public class JsonSurfer {
         } catch (NullPointerException e) {
             return null;
         }
+    }
+
+    public boolean dive(Object... keys) {
+        JsonElement element = get(keys);
+        if (element != null) {
+            this.element = element;
+            return true;
+        }
+        return false;
+    }
+
+    public JsonSurfer getSurfer(Object... keys) {
+        return new JsonSurfer(get(keys));
+    }
+
+    public int size() {
+        return this.element.getAsJsonArray().size();
     }
 
     @Override
